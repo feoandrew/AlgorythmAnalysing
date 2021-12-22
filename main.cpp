@@ -8,41 +8,40 @@
 using namespace std;
 int main(){
   setlocale(LC_ALL, "rus");
-  int n=0;
-  int m=0;
+  int n=10;
+  int m=15;
   int* out;
-  unsigned int start_time;
-  unsigned int end_time;
-  unsigned int search_time;
+
   
   ifstream infile("Graph.txt");
-  //cout << "Введите кол-во вершин: ";
-  infile >> n;
-  //cout << "Введите кол-во ребер: ";
-  infile >> m;
-  Graph G(n,m);
-  G.InputGraph(n, m, infile);
+ // infile >> n;
+ // infile >> m;
+  for (int n = 100; n <= 10000; n = n + 100) {
+    // cout << "Введите кол-во вершин: ";
+
+    // cout << "Введите кол-во ребер: ";
+   m = n * n;
+    Graph G(n, m);
+   //  G.InputGraph(n, m, infile);
+    G.generateFullGraph(n, 1, 10000000);
+    cout << "count: " << n << endl;
+    Prim prim;
+    
+    
+    
+//     for (int i = 0; i < (n - 1) * 2; i++) cout << out[i];
+    
+    Crascal crascal;
   
- 
+    out = crascal.Process(G);
+
+
+    out = prim.Process(G);
+   // 
+  //   for (int i = 0; i<(n-1)*2; i++)
+  //   cout << out[i];
    
-  
-
-  Prim prim;
-  start_time = clock();
-  out = prim.Process(G);
-  end_time = clock();
-  for (int i = 0; i < (n - 1) * 2; i++) cout << out[i];
-  search_time = end_time - start_time;
-
-  cout << endl<<"Time: " <<search_time<<endl;
-  Crascal crascal;
-  start_time = clock();
-  out = crascal.Process(G);
-  end_time = clock();
-  for (int i = 0; i<(n-1)*2; i++)
-  cout << out[i];
-  search_time = end_time - start_time;
-  cout << endl << "Time: " << search_time << endl;
+  }
 }
 
 

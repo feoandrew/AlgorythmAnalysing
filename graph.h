@@ -24,10 +24,13 @@ class Graph {
   ~Graph();
   int W(int u, int v);
   void InputGraph(int n,int m, std::ifstream & file);
+  void generateFullGraph(int n, int q, int r);
+  void generateOkrsList();
+
   int getN();
   int getM();
-  std::vector<Edge> getOkrOf(int id);
-  Edge getEdgeById(int id);
+  std::vector<Edge>* getOkrOf(int id);
+  Edge getNextEdge();
   void show();
   
 
@@ -35,7 +38,7 @@ class Graph {
   int n;//число вершин
   int m;//число реёбер
   int* V;//множество вершин
-  int* E;//множество рёбер
+  std::vector<std::vector<Edge>> Okrs;
   std::multiset<Edge, custom_compare> tree;
   std::multiset<Edge>::iterator iter;
   int iter_position;

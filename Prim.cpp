@@ -10,75 +10,82 @@ int* Prim::Process(Graph& G) {
   a = new int[G.getN()];
   b = new int[G.getN()];
   ET = new int[G.getM()*2];
-  
+ 
+  std::vector<int> blue;
+  unsigned int start_time;
+  unsigned int end_time;
+  unsigned int search_time;
 
+  start_time = clock();
+  G.generateOkrsList();
   
     
     int first = 0;
-    int mt;
+    
     for (int i = 0; i < G.getN(); i++) {
       a[i] = INF;
       VT[i] = 0;
     }
     VT[first] = 1;
+   
+    std::vector<Edge>* start = G.getOkrOf(first);
+    for (auto&& data : *start) {
+      if (data.begin == first || data.end == first) {
+        if (data.begin == first) {
+          a[data.end] = data.weight;
+          b[data.end] = first;
+        } else {
+          a[data.begin] = data.weight;
+          b[data.begin] = first;
+        }
+      }
 
-    //a = new int[G.getN()];    
+    }
+
+    
+    //a = new int[G.getN()]; 
     
       for (int j = 0; j <G.getN()-1; j++) {
        
-        Edge candidat;
-        candidat.weight=INF;
-        bool conn = false;
-        for (int i = 0; i < G.getN(); i++) {
-          if (VT[i] == 1) {
-            std::vector<Edge> okr = G.getOkrOf(i);
+        int candidat = argmin(a, 0,G.getN());
+        
+        
+       if (a[candidat]==INF) {
+          exit(1);
+       }
+       int host = b[candidat]; 
+       VT[candidat] = 1;
+
+            
+          
+          std::vector<Edge>* okr = G.getOkrOf(candidat);
 
            
             
-            for (auto&& data : okr) {
+            for (auto&& data : *okr) {
               int tail;
-              if (data.begin==i || data.end==i)
+              if (data.begin == candidat || data.end == candidat)
               {
                 
-                if (data.begin==i) {
+                if (data.begin == candidat) {
                   tail = data.end;
                 } else {
                   tail = data.begin;
                 }
-                if (VT[tail] == 1)
+                if (VT[tail] == 0)
                 {
-                  if (data.weight < a[tail] && b[i] != tail) {
+                  if (data.weight < a[tail] ) {
                     a[tail] = data.weight;
-                    b[tail] = i;
+                    b[tail] = candidat;
                   }
                 } 
-                else {
-                  conn = true;
-                  if (data.weight < candidat.weight) {
-                   
-                    candidat.weight=data.weight;
-                    if (data.begin == i) {
-                      candidat.begin = data.begin;
-                      candidat.end = data.end;
-                    } else {
-                      candidat.begin = data.end;
-                      candidat.end = data.begin;
-                    }
-                    
-                  }
-                }
+                
                 
               }
             }
-          }
-        }
-        if (!conn) {
-          std::cout << "Ошибка: граф не связен";
-          exit(1);
-        }
-        VT[candidat.end] = 1;
-        a[candidat.end] = candidat.weight;
-        b[candidat.end] = candidat.begin;
+          
+        
+       
         
 
         
@@ -87,7 +94,9 @@ int* Prim::Process(Graph& G) {
         
         
       }
-    
+    end_time = clock();
+      search_time = end_time - start_time;
+      std::cout << std::endl << "PrimTime: " << search_time << std::endl;
     int offset = 0;
     for (int i = 0; i < G.getN(); i++) {
       if (i==first) {

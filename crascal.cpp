@@ -2,38 +2,52 @@
 #include"crascal.h"
 
 
+
 int* Crascal::Process(Graph& G) {
+  unsigned int start_time;
+  unsigned int end_time;
+  unsigned int search_time;
   ET = new int[G.getM() * 2];
-  std::vector<int> part = {G.getEdgeById(0).begin, G.getEdgeById(0).end};
+  start_time = clock();
+  
+  
+ 
   Edge candidat;
-  ET[0] = part[0];
-  ET[1] = part[1];
-  parts.push_back(part);
+  
+  for (int i=0; i<G.getN(); i++) {
+    Part* newpart = new Part();
+    newpart->push_back(i);
+
+    parts.push_back(newpart);
+  }
+
+  
   int outiter = 2;
-  for (int i = 1; i < G.getM(); i++) {
-    candidat = G.getEdgeById(i);
+  for (int i = 0; i < G.getM(); i++) {
+    candidat = G.getNextEdge();
    
-    int begpart = -1;
-    int endpart = -1;
-    int partnum = 0;
+    Part* begpart = nullptr;
+    Part* endpart = nullptr;
+    bool correct = true;
     for (auto&& data : parts) {
-      bool begin =
-          std::find(data.begin(), data.end(), candidat.begin) != data.end();
-      bool end =
-          std::find(data.begin(), data.end(), candidat.end) != data.end();
+      bool begin = data->find(candidat.begin);
+      bool end = data->find(candidat.end);
+          
       
       if (begin && end) {
-        int begpart = -2;
-        int endpart = -2;
+        correct = false; 
        break;
       }
       if (begin) {
-        begpart = partnum;
+        begpart = data;
       }
       if (end) {
-        endpart = partnum;
+        endpart = data;
       }
-      partnum++;
+      if (begpart !=nullptr && endpart!=nullptr) {
+        break;
+      }
+     
 
       
 
@@ -41,58 +55,44 @@ int* Crascal::Process(Graph& G) {
       
       
     }
-    if (begpart >=-1 || endpart >=-1) {
-      if (begpart >= 0 && endpart >= 0) {
-        unite(begpart, endpart);
+    if (correct) {
+      if (begpart != nullptr && endpart!= nullptr) {
+        begpart->unite(endpart);
+        parts.remove(endpart);
+         
         ET[outiter] = candidat.begin;
         ET[outiter + 1] = candidat.end;
         outiter+=2;
         continue;
       }
-      if (begpart >= 0) {
-        parts[begpart].push_back(candidat.end);
+      if (begpart != nullptr) {
+        begpart->push_back(candidat.end);
         ET[outiter] = candidat.begin;
         ET[outiter + 1] = candidat.end;
         outiter+=2;
         continue;
       }
-      if (endpart >= 0) {
-        parts[endpart].push_back(candidat.begin);
+      if (endpart != nullptr) {
+        endpart->push_back(candidat.begin);
         ET[outiter] = candidat.begin;
         ET[outiter + 1] = candidat.end;
         outiter+=2;
         continue;
       }
       }
-    std::vector<int> newpart = {candidat.begin, candidat.end};
-
-    parts.push_back(newpart);
-    ET[outiter] = candidat.begin;
-    ET[outiter + 1] = candidat.end;
-    outiter+=2;
+      
+    
       
     
   }
+  end_time = clock();
+  search_time = end_time - start_time;
+  std::cout << std::endl << "CrascalTime: " << search_time << std::endl;
   return ET;
 }
-void Crascal::unite(int first, int second) {
-  int donor;
-  int acceptor;
-  if (parts[first].size() > parts[second].size()) {
-    donor = second;
-    acceptor = first;
-  } else {
-    donor = first;
-    acceptor = second;
-  }
 
-  
-  for (int i = 0; i < parts[donor].size(); i++) {
-    parts[acceptor].push_back( parts[donor][i]);
-  }
-  parts[donor].clear();
 
-}
+
 Crascal::Crascal() {}
 
 Crascal::~Crascal() {}

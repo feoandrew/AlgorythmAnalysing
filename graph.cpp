@@ -2,6 +2,7 @@
 #include <set>
 #include <vector>
 #include<fstream>
+#include<random>
 
 
 
@@ -65,20 +66,44 @@ void Graph::show() {
   for (auto &&data : tree) std::cout << data.weight << std::endl;
 }
 
-std::vector<Edge> Graph::getOkrOf(int id) { 
-  std::vector<Edge> res;
-  for (auto &&data : tree) {
-    if (data.begin == id || data.end == id) res.push_back(data);
-  }
+
+std::vector<Edge>* Graph::getOkrOf(int id) { 
+  
+  return &Okrs[id];
+}
+
+Edge Graph::getNextEdge() {
+  
+  Edge res = *iter;
+    iter++;
+  
   return res;
 }
-
-Edge Graph::getEdgeById(int id) {
-  iter = tree.begin();
-  for (int i=0; i<id; i++) {
-    iter++;
+void Graph::generateFullGraph(int n, int q, int r) {
+  srand(time(0));
+  tree.clear();
+  m = 0;
+  for (int i = 0; i < n; i++) {
+    for (int j=1; j<n-i; j++) {
+      Edge edge;
+      edge.begin = i;
+      edge.end = i+j; 
+      edge.weight = q + rand()%r;
+      tree.insert(edge);
+      m++;
+    }
   }
-  return *iter;
+  iter = tree.begin();
 }
+void Graph::generateOkrsList() {
 
+  for (int i = 0; i < n; i++) {
+    std::vector<Edge> okr;
+    Okrs.push_back(okr);
+  }
+    for (auto &&data : tree) {
+      Okrs[data.begin].push_back(data);
+      Okrs[data.end].push_back(data);
+    }
+}
 
